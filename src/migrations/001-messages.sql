@@ -1,0 +1,9 @@
+-- Up
+CREATE TABLE messages (
+  id INTEGER PRIMARY KEY,
+  content TEXT NOT NULL,
+  created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- Down
+DROP TABLE messages;

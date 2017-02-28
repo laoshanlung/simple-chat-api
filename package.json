@@ -1,0 +1,29 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/.bin/nodemon ./start.js"
+  },
+  "author": "Tan Nguyen <tan.qh.nguyen@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.7",
+    "body-parser": "^1.16.1",
+    "cookie-parser": "^1.4.3",
+    "faye": "^1.2.4",
+    "js-yaml": "^3.8.1",
+    "lodash": "^4.17.4",
+    "nconf": "^0.8.4",
+    "passport": "^0.3.2",
+    "passport-github2": "^0.1.10",
+    "permessage-deflate": "^0.1.5",
+    "sqlite": "^2.3.0",
+    "xss-filters": "^1.2.7"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
