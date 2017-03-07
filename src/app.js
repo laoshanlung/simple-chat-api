@@ -1,7 +1,8 @@
 const express = require('express'),
       bodyParser = require('body-parser'),
       cookieParser = require('cookie-parser'),
-      config = require('./config');
+      config = require('./config'),
+      jwt = require('express-jwt');
 
 const allowCors = (req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
@@ -24,8 +25,8 @@ app.use((req, res, next) => {
     return res.json({data, error: null, success: true});
   };
 
-  res.jsonError = function(error) {
-    return res.status(400).json({
+  res.jsonError = function(error, status = 400) {
+    return res.status(status).json({
       data: null,
       error: error,
       success: false
@@ -35,6 +36,16 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(jwt({
+  secret: config.get('auth.secret'),
+  requestProperty: 'token',
+  credentialsRequired: false,
+  getToken: function fromHeaderOrQuerystring (req) {
+    return req.cookies.token;
+  }
+}));
+
 app.use('/api/messages', require('./routes/messages'));
+app.use('/auth', require('./routes/auth'));
 
 module.exports = app;

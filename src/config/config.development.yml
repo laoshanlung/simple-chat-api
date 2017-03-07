@@ -1,2 +1,14 @@
 express:
   port: 9000
+
+api:
+  url: http://localhost:9000
+
+web:
+  url: http://localhost:8080
+
+auth:
+  secret: secret
+  github:
+    id: put-github-id-here
+    secret: put-github-secret-here
