@@ -2,7 +2,8 @@ const sqlite = require('sqlite'),
       Promise = require('bluebird'),
       xssFilters = require('xss-filters'),
       _ = require('lodash'),
-      changeCase = require('change-case');
+      changeCase = require('change-case'),
+      faye = require('./faye');
 
 function changeAllKeysToCamelCase(row) {
   if (_.isArray(row)) {
@@ -32,14 +33,19 @@ module.exports = {
     `, [limit]).then(changeAllKeysToCamelCase);
   },
 
-  createMessage(content) {
+  createMessage(content, userId) {
     if (!content) return Promise.reject('Missing content');
 
     content = xssFilters.inHTMLData(content);
 
+    faye.publish('/messages', {
+      event: 'createMessage',
+      payload: {content, userId}
+    });
+
     return sqlite.run(`
-      INSERT INTO messages(content) VALUES (?)
-    `, [content]).then((stm) => {
+      INSERT INTO messages(content, userId) VALUES (?, ?)
+    `, [content, userId]).then((stm) => {
       return sqlite.get(`
         SELECT * FROM messages WHERE id = ?
       `, [stm.lastID]);
@@ -47,6 +53,11 @@ module.exports = {
   },
 
   deleteMessage(id) {
+    faye.publish('/messages', {
+      event: 'deleteMessage',
+      payload: {id}
+    });
+
     return sqlite.run(`
       DELETE FROM messages WHERE id = ?
     `, [id]).then((stm) => {
@@ -58,6 +69,11 @@ module.exports = {
     if (!content) return Promise.reject('Missing content');
 
     content = xssFilters.inHTMLData(content);
+
+    faye.publish('/messages', {
+      event: 'updateMessage',
+      payload: {id, content}
+    });
 
     return sqlite.run(`
       UPDATE messages

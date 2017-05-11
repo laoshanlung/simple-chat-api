@@ -7,6 +7,10 @@ api:
 web:
   url: http://localhost:8080
 
+faye:
+  url: http://localhost:8000/faye
+  secret: meh
+
 auth:
   secret: secret
   github:
