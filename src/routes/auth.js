@@ -42,6 +42,21 @@ router.get('/github/callback',
   }
 );
 
+router.get('/me', (req, res) => {
+  const {
+    token
+  } = req;
+
+  if (!token || !token.user || !token.user.id) return res.jsonData(null);
+
+  res.jsonData(token.user);
+});
+
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect(302, config.get('web.url'));
+});
+
 function authenticated() {
   return (req, res, next) => {
     const {
