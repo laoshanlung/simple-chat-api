@@ -14,5 +14,5 @@ faye:
 auth:
   secret: secret
   github:
-    id: put-github-id-here
-    secret: put-github-secret-here
+    id: fddc62938df93ec4126d
+    secret: b15c1628cea72e5056decf83285cfd983d94c004
