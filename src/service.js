@@ -20,6 +20,19 @@ function changeAllKeysToCamelCase(row) {
   return row;
 }
 
+function formatMessage (row) {
+  return {
+    id: row.id,
+    content: row.content,
+    created: row.created,
+    user: _.pick(row, [
+      'display_name',
+      'profile_url',
+      'avatar_url'
+    ])
+  };
+}
+
 module.exports = {
   getMessageById(id) {
     return sqlite.get(`
@@ -29,8 +42,15 @@ module.exports = {
 
   getMessages(limit = 50) {
     return sqlite.all(`
-      SELECT * FROM messages LIMIT ?
-    `, [limit]).then(changeAllKeysToCamelCase);
+      SELECT m.id, m.content, m.created,
+        u.display_name,
+        u.profile_url,
+        u.avatar_url
+      FROM messages m
+      JOIN users u ON u.id = m.user_id
+      ORDER BY m.created DESC
+      LIMIT ?
+    `, [limit]).map(formatMessage).then(changeAllKeysToCamelCase);
   },
 
   createMessage(content, userId) {
@@ -38,23 +58,29 @@ module.exports = {
 
     content = xssFilters.inHTMLData(content);
 
-    faye.publish('/messages', {
-      event: 'createMessage',
-      payload: {content, userId}
-    });
-
     return sqlite.run(`
-      INSERT INTO messages(content, userId) VALUES (?, ?)
+      INSERT INTO messages(content, user_id) VALUES (?, ?)
     `, [content, userId]).then((stm) => {
       return sqlite.get(`
-        SELECT * FROM messages WHERE id = ?
+        SELECT m.id, m.content, m.created,
+          u.display_name,
+          u.profile_url,
+          u.avatar_url
+        FROM messages m
+        JOIN users u ON u.id = m.user_id
+        WHERE m.id = ?
       `, [stm.lastID]);
-    }).then(changeAllKeysToCamelCase);
+    }).then(formatMessage).then(changeAllKeysToCamelCase).tap((message) => {
+      faye.publish('/messages', {
+        event: 'receivedMessage',
+        payload: message
+      });
+    });
   },
 
   deleteMessage(id) {
     faye.publish('/messages', {
-      event: 'deleteMessage',
+      event: 'deletedMessage',
       payload: {id}
     });
 
@@ -101,8 +127,8 @@ module.exports = {
           WHERE id = ?
         `, [
           avatarUrl,
-          profileUrl,
           displayName,
+          profileUrl,
           row.id
         ]).then(() => {
           return Object.assign(row, {

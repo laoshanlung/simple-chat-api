@@ -7,7 +7,8 @@ client.addWebsocketExtension(deflate);
 
 const clientAuth = {
   outgoing: function(message, callback) {
-    if (message.channel !== '/meta/subscribe') return callback(message);
+    if (message.channel !== '/messages') return callback(message);
+
     message.ext = message.ext || {};
     message.ext.secret = config.get('faye.secret');
     callback(message);

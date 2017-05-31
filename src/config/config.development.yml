@@ -14,5 +14,5 @@ faye:
 auth:
   secret: secret
   github:
-    id: put-github-id-here
-    secret: put-github-secret-here
+    id: id
+    secret: secret

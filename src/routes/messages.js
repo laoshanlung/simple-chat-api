@@ -47,7 +47,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', authenticated(), (req, res) => {
-  service.createMessage(req.body.content).then(res.jsonData, res.jsonError);
+  const token = req.token;
+  service.createMessage(req.body.content, token.user.id).then(res.jsonData, res.jsonError);
 });
 
 router.delete('/:id(\\d+)', authenticated(), checkAuthor(), (req, res) => {
