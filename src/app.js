@@ -44,4 +44,8 @@ app.use(jwt({
 app.use('/api/messages', require('./routes/messages'));
 app.use('/auth', require('./routes/auth'));
 
+app.get('/status', (req, res) => {
+  res.end('Ok');
+});
+
 module.exports = app;

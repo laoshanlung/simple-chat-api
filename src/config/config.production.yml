@@ -1,0 +1,18 @@
+express:
+  port: 5000
+
+api:
+  url: http://simple-chat-api.tannguyen.org
+
+web:
+  url: http://simple-chat.tannguyen.org
+
+faye:
+  url: http://simple-chat-faye.tannguyen.org/faye
+  secret: secret
+
+auth:
+  secret: secret
+  github:
+    id: secret
+    secret: secret
